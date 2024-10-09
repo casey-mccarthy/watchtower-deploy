@@ -1,0 +1,40 @@
+version: '3.9'  # Docker Compose version
+
+services:
+  watchtower-db:
+    image: postgres:15
+    container_name: watchtower-db
+    restart: always
+    networks:
+      - watchtower
+    volumes:
+      - watchtower-pgsql:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Use .env file to provide password securely
+      POSTGRES_DB: emm
+
+  watchtower:
+    image: sherpa6.azurecr.us/watchtower:24.3.0
+    container_name: watchtower
+    restart: always
+    depends_on:
+      - watchtower-db
+    networks:
+      - watchtower
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD}  # Use .env file for password
+      DB_ADDRESS: watchtower-db
+      BIND_ADDRESS: ":8080"
+      INSECURE: "true"
+
+networks:
+  watchtower:
+    driver: bridge  # Default bridged network
+
+volumes:
+  watchtower-pgsql:
+    external: true  # Make sure volume already exists or create it beforehand
