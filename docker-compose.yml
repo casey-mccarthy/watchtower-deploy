@@ -26,7 +26,7 @@ services:
       - "8080:8080"
     environment:
       DB_USER: postgres
-      DB_PASSWORD: ${DB_PASSWORD}  # Use .env file for password
+      DB_PASSWORD: ${WT_API_PASSWORD}  # Use .env file for password
       DB_ADDRESS: watchtower-db
       BIND_ADDRESS: ":8080"
       INSECURE: "true"
