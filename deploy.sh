@@ -11,7 +11,7 @@ check_docker_installed
 check_docker_compose_installed
 
 # Load Docker images from the 'src' folder
-load_docker_images
+#load_docker_images
 
 # Bring up the PostgreSQL container first
 docker-compose up -d watchtower-db
