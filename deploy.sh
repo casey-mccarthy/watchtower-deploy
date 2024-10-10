@@ -19,19 +19,20 @@ check_docker_installed
 check_docker_compose_installed
 
 # Determine if the script should run in offline or online mode
+DOCKER_COMPOSE_CONTEXT=""
 if [ "$MODE" == "offline" ]; then
   # Load Docker images from the 'containers' folder
   echo -e "${YELLOW}Running in offline mode. Loading Docker images from local tar files in container directory...${NC}"
   load_docker_images
-  COMPOSE_FILE="./deploy/offline/docker-compose.offline.yml"
+  DOCKER_COMPOSE_CONTEXT="-f docker-compose.offline.yml"
 else
   echo -e "${YELLOW}Running in online mode. Pulling Docker images from ghcr.io...${NC}"
   docker-compose pull
-  COMPOSE_FILE="./deploy/online/docker-compose.yml"
+  DOCKER_COMPOSE_CONTEXT="-f docker-compose.yml"
 fi
 
 # Bring up the PostgreSQL container first
-docker-compose -f $COMPOSE_FILE up -d watchtower-db
+docker-compose $DOCKER_COMPOSE_CONTEXT up -d watchtower-db
 
 # Wait for PostgreSQL to be ready
 wait_for_postgres
@@ -40,4 +41,4 @@ wait_for_postgres
 check_and_create_database "emm"
 
 # Bring up the rest of the Docker Compose stack
-docker-compose -f $COMPOSE_FILE up -d
+docker-compose $DOCKER_COMPOSE_CONTEXT up -d
