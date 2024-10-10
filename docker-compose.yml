@@ -2,7 +2,7 @@ version: '3.9'  # Docker Compose version
 
 services:
   watchtower-db:
-    image: postgres:15
+    image: ghcr.io/casey-mccarthy/postgres:15
     container_name: watchtower-db
     restart: always
     networks:
@@ -15,7 +15,7 @@ services:
       POSTGRES_DB: emm
 
   watchtower:
-    image: sherpa6.azurecr.us/watchtower:24.3.0
+    image: ghcr.io/casey-mccarthy/watchtower:24.3.0
     container_name: watchtower
     restart: always
     depends_on:
