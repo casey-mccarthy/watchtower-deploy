@@ -1,12 +1,15 @@
 version: '3.9'  # Docker Compose version
 
 services:
+  # PostgreSQL Database Service
   watchtower-db:
     image: ghcr.io/casey-mccarthy/postgres:15
     container_name: watchtower-db
     restart: always
     networks:
-      - watchtower
+      watchtower:
+        aliases:
+          - watchtower-database  # Setting network alias for compatibility
     volumes:
       - watchtower-pgsql:/var/lib/postgresql
     environment:
@@ -14,6 +17,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Use .env file to provide password securely
       POSTGRES_DB: emm
 
+  # Watchtower Service
   watchtower:
     image: ghcr.io/casey-mccarthy/watchtower:24.3.0
     container_name: watchtower
@@ -21,15 +25,26 @@ services:
     depends_on:
       - watchtower-db
     networks:
-      - watchtower
+      watchtower:
+        aliases:
+          - watchtower  # Setting network alias for compatibility
     ports:
       - "8080:8080"
     environment:
       DB_USER: postgres
-      DB_PASSWORD: ${WT_API_PASSWORD}  # Use .env file for password
-      DB_ADDRESS: watchtower-db
+      DB_PASSWORD: ${DB_PASSWORD}  # Use .env file for database password
+      DB_ADDRESS: watchtower-database  # Use network alias as database address
       BIND_ADDRESS: ":8080"
       INSECURE: "true"
+    command:
+      [
+        "-pwd", "${WT_API_PASSWORD}",         # Watchtower API password from .env file
+        "-dbaddress", "watchtower-database",  # Reference the network alias for DB address
+        "-dbuser", "postgres",
+        "-dbpwd", "${POSTGRES_PASSWORD}",     # Use Postgres password from .env file
+        "-bindto", ":8080",
+        "-insecure"
+      ]
 
 networks:
   watchtower:
@@ -37,4 +52,4 @@ networks:
 
 volumes:
   watchtower-pgsql:
-    external: true  # Make sure volume already exists or create it beforehand
+    driver: local  # Create a local volume if it doesn't exist
