@@ -83,3 +83,25 @@ install_docker_compose() {
         exit 1
     fi
 }
+
+
+# Function to load Docker images from the 'src' folder
+load_docker_images() {
+    local src_dir="./containers"  # Set the directory containing the Docker images
+    if [ -d "$src_dir" ]; then
+        echo -e "${GREEN}Loading Docker images from $src_dir...${NC}"
+        for image_file in "$src_dir"/*.tar; do
+            if [ -f "$image_file" ]; then
+                echo -e "${GREEN}Loading image: $image_file${NC}"
+                docker load -i "$image_file" || { echo -e "${RED}Failed to load image: $image_file${NC}"; exit 1; }
+            else
+                echo -e "${RED}No .tar files found in $src_dir${NC}"
+                exit 1
+            fi
+        done
+        echo -e "${GREEN}All Docker images have been successfully loaded.${NC}"
+    else
+        echo -e "${RED}Source directory $src_dir does not exist. Please check the path.${NC}"
+        exit 1
+    fi
+}
