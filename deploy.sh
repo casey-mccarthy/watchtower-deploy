@@ -19,8 +19,15 @@ check_docker_installed
 check_docker_compose_installed
 check_docker_installed
 
-# Load Docker images from the 'src' folder
-#load_docker_images
+# Determine if the script should run in offline or online mode
+if [ "$MODE" == "offline" ]; then
+  # Load Docker images from the 'containers' folder
+  echo -e "${YELLOW}Running in offline mode. Loading Docker images from local tar files in container directory...${NC}"
+  load_docker_images
+else
+  echo -e "${YELLOW}Running in online mode. Pulling Docker images from ghcr.io...${NC}"
+  docker-compose pull
+fi
 
 # Bring up the PostgreSQL container first
 docker-compose up -d watchtower-db

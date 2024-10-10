@@ -42,3 +42,21 @@ fi
 # Display the final .env file content for confirmation
 echo -e "${GREEN}Final .env file content:${NC}"
 cat .env
+
+
+# Load mode from .env file if it exists, otherwise prompt the user
+if [ -f .env ]; then
+source .env
+else
+while true; do
+    read -p "Enter deployment mode (offline/online) [online]: " MODE_INPUT
+    MODE_INPUT=${MODE_INPUT:-online}
+    if [[ "$MODE_INPUT" == "offline" || "$MODE_INPUT" == "online" ]]; then
+    MODE=$MODE_INPUT
+    echo "MODE=$MODE" >> .env
+    break
+    else
+    echo -e "${RED}Invalid input. Please enter 'offline' or 'online'.${NC}"
+    fi
+done
+fi
