@@ -1,1 +1,0 @@
-This is a placeholder for empty folder. Place the containers from Sherpa6 for Watchtower in this directory.

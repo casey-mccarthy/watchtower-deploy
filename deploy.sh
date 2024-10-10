@@ -9,6 +9,7 @@ check_docker_installed
 
 # Check if Docker Compose is installed, and install if it is not
 check_docker_compose_installed
+check_docker_installed
 
 # Load Docker images from the 'src' folder
 #load_docker_images

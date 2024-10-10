@@ -5,18 +5,35 @@ RED='\033[0;31m'     # Red color for errors
 GREEN='\033[0;32m'   # Green color for success
 NC='\033[0m'         # No Color (reset to default)
 
-# Function to check if Docker is installed
+# Function to check if Docker is installed and enable Docker service
 check_docker_installed() {
     if command -v docker &> /dev/null; then
         echo -e "${GREEN}Docker is already installed.${NC}"
+        # Check if docker-ce is installed
+        if dpkg -l | grep -q docker-ce; then
+            echo -e "${GREEN}docker-ce is installed.${NC}"
+        else
+            echo -e "${RED}docker-ce is not installed. Installing docker-ce...${NC}"
+            install_docker_ce
+        fi
+
+        # Enable and start Docker service if not already enabled
+        if systemctl is-enabled docker &> /dev/null; then
+            echo -e "${GREEN}Docker service is already enabled to start on reboot.${NC}"
+        else
+            echo -e "${RED}Docker service is not enabled. Enabling now...${NC}"
+            sudo systemctl enable docker
+            sudo systemctl start docker
+            echo -e "${GREEN}Docker service has been enabled and started.${NC}"
+        fi
     else
         echo -e "${RED}Docker is not installed. Installing Docker...${NC}"
         install_docker
     fi
 }
 
-# Function to install Docker (example for Ubuntu)
-install_docker() {
+# Function to install Docker CE (Community Edition) if not installed
+install_docker_ce() {
     # Update package index and install prerequisites
     sudo apt-get update
     sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -25,7 +42,7 @@ install_docker() {
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-    # Install Docker
+    # Install Docker CE
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
@@ -33,7 +50,13 @@ install_docker() {
     sudo systemctl enable docker
     sudo systemctl start docker
 
-    echo -e "${GREEN}Docker has been installed successfully.${NC}"
+    echo -e "${GREEN}docker-ce has been installed successfully.${NC}"
+}
+
+# Function to install Docker (if Docker command not found)
+install_docker() {
+    # Call the install_docker_ce function to handle the installation
+    install_docker_ce
 }
 
 # Function to check if Docker Compose is installed
@@ -57,28 +80,6 @@ install_docker_compose() {
         echo -e "${GREEN}Docker Compose has been installed successfully.${NC}"
     else
         echo -e "${RED}Failed to install Docker Compose. Please check your configuration.${NC}"
-        exit 1
-    fi
-}
-
-# Function to load Docker images from the 'src' folder
-load_docker_images() {
-    local src_dir="./src"  # Set the directory containing the Docker images
-
-    if [ -d "$src_dir" ]; then
-        echo -e "${GREEN}Loading Docker images from $src_dir...${NC}"
-        for image_file in "$src_dir"/*.tar; do
-            if [ -f "$image_file" ]; then
-                echo -e "${GREEN}Loading image: $image_file${NC}"
-                docker load -i "$image_file" || { echo -e "${RED}Failed to load image: $image_file${NC}"; exit 1; }
-            else
-                echo -e "${RED}No .tar files found in $src_dir${NC}"
-                exit 1
-            fi
-        done
-        echo -e "${GREEN}All Docker images have been successfully loaded.${NC}"
-    else
-        echo -e "${RED}Source directory $src_dir does not exist. Please check the path.${NC}"
         exit 1
     fi
 }
