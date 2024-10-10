@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Define color codes for printed messages
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -22,11 +23,11 @@ if [ "$MODE" == "offline" ]; then
   # Load Docker images from the 'containers' folder
   echo -e "${YELLOW}Running in offline mode. Loading Docker images from local tar files in container directory...${NC}"
   load_docker_images
-  COMPOSE_FILE="docker-compose.offline.yml"
+  COMPOSE_FILE="./deploy/offline/docker-compose.offline.yml"
 else
   echo -e "${YELLOW}Running in online mode. Pulling Docker images from ghcr.io...${NC}"
   docker-compose pull
-  COMPOSE_FILE="docker-compose.yml"
+  COMPOSE_FILE="./deploy/online/docker-compose.yml"
 fi
 
 # Bring up the PostgreSQL container first
