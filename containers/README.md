@@ -1,4 +1,4 @@
-# Enterprise Mobility Management (EMM)
+# Watchtower Enterprise Mobility Management (EMM)
 
 ## Complete Control at the Tactical Edge
 
