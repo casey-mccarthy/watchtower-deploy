@@ -35,15 +35,14 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}  # Use .env file for database password
       DB_ADDRESS: watchtower-database  # Use network alias as database address
       BIND_ADDRESS: ":3020"
-      INSECURE: "true"
+      INSECURE: "false"
     command:
       [
         "-pwd", "${WT_API_PASSWORD}",         # Watchtower API password from .env file
         "-dbaddress", "watchtower-database",  # Reference the network alias for DB address
         "-dbuser", "postgres",
         "-dbpwd", "${POSTGRES_PASSWORD}",     # Use Postgres password from .env file
-        "-bindto", ":3020",
-        "-insecure"
+        "-bindto", ":3020"
       ]
 
 networks:
