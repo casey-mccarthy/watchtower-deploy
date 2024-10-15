@@ -11,7 +11,7 @@ services:
         aliases:
           - watchtower-database  # Setting network alias for compatibility
     volumes:
-      - watchtower-pgsql:/var/lib/postgresql
+      - watchtower-pgsql:/var/lib/postgresql/data  # Correct volume path
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Use .env file to provide password securely
